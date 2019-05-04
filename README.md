@@ -51,4 +51,4 @@ La seconde va lancer les tests sur la partie front.
 
 La dernière va se connecter en SSH à notre serveur de staging basé sur Digital Ocean, stopper les containers Docker en cours, pull les dernières versions des images Docker pour Web et Server et enfin relancer les containers.
 
-![image](https://gitlab.com/guillaumepn/dreamteam/wikis/uploads/68096848862ee4a0ad55e9e1fc1c6b90/image.png)
+<img width="1007" alt="devops1" src="https://user-images.githubusercontent.com/10799586/57179289-6f129680-6e7c-11e9-8b7e-5e3387b79569.png">
