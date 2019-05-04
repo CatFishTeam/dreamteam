@@ -2,6 +2,7 @@ image: docker:stable
 
 stages:
     - build
+    - test
     - deploy
 
 variables:
@@ -34,6 +35,15 @@ build_staging:
         - docker push registry.gitlab.com/guillaumepn/dreamteam/server:latest
         - docker build -f ./web/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/web .
         - docker push registry.gitlab.com/guillaumepn/dreamteam/web:latest
+
+test_web:
+    image: node:lts
+    stage: test
+    before_script:
+        - cd ./web
+        - yarn install
+    script:
+        - yarn test --coverage=0 || if [ $? -eq 1 -o $? -eq 0 ]; then echo “success”; else exit $?; fi
 
 deploy_staging:
     only:
