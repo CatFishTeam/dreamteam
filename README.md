@@ -76,3 +76,12 @@ Nous utilisons Jest pour nos tests côté front :
 
 
   
+### Déploiement
+Nous avons crée un cluster Kubernetes sur Rancher sur lequel nous deployons le front de l'application en se basant sur le registry interne de Gitlab où nous avons les builds.
+
+<a href="https://ibb.co/x70hSV3"><img src="https://i.ibb.co/rwSkGnv/Screenshot-2019-05-04-at-15-50-02.png" alt="Screenshot-2019-05-04-at-15-50-02" border="0"></a>
+
+### Monitoring
+Nous utilisons sonarqube pour le monitoring de notre application.
+
+<img src="https://screenshotscdn.firefoxusercontent.com/images/6917cb1a-d21e-45de-9b3d-49934e68bcba.png">
