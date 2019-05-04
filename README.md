@@ -56,12 +56,21 @@ La dernière va se connecter en SSH à notre serveur de staging basé sur Digita
 Nous sommes d'abord passé par Jenkins pour l'étape de build :
 
 <img width="1208" alt="devops-jenkins" src="https://user-images.githubusercontent.com/10799586/57179293-96696380-6e7c-11e9-930a-692282afbaa4.png">
-<i style="text-align: center;">Premier test de build sur Jenkins</i>  
+<i>Premier test de build sur Jenkins</i>  
 
 
 Puis nous avons opté pour Gitlab-CI (comme nous utilisons Gitlab pour versionner notre projet), qui nous sert également pour déclencher nos tests et notre déploiement :
 
 <img width="1007" alt="devops1" src="https://user-images.githubusercontent.com/10799586/57179289-6f129680-6e7c-11e9-8b7e-5e3387b79569.png">
 <i>Version actuelle de nos jobs avec l'utilisation de Gitlab CI</i>
+
+
+### Tests
+
+Nous utilisons Jest pour nos tests côté front :  
+
+<img width="918" alt="devops-tests" src="https://user-images.githubusercontent.com/10799586/57179427-2bb92780-6e7e-11e9-99ef-ed6546626418.png">
+<i>Exemple de job Gitlab CI exécutant nos tests</i>
+
 
   
