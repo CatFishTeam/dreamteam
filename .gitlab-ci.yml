@@ -69,12 +69,12 @@ deploy_staging:
           docker stop server || true &&
           docker rm server || true &&
           docker rmi -f registry.gitlab.com/guillaumepn/dreamteam/server || true &&
-          docker run --network=dreamteam_net --name=server --restart=on-failure:10 -p -d 4000:4000 registry.gitlab.com/guillaumepn/dreamteam/server:latest
+          docker run --network=dreamteam_net --name=server --restart=on-failure:10 -d -p 4000:4000 registry.gitlab.com/guillaumepn/dreamteam/server:latest
           "
         # Run web
         - ssh $SERVER_USER@$SERVER_HOST "
           docker stop web || true &&
           docker rm web || true &&
           docker rmi -f registry.gitlab.com/guillaumepn/dreamteam/web || true &&
-          docker run --network=dreamteam_net --name=web --restart=on-failure:10 -p -d 8000:80 registry.gitlab.com/guillaumepn/dreamteam/web:latest
+          docker run --network=dreamteam_net --name=web --restart=on-failure:10 -d -p 8000:80 registry.gitlab.com/guillaumepn/dreamteam/web:latest
           "
