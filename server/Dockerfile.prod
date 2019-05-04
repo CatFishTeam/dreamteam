@@ -1,0 +1,11 @@
+FROM mhart/alpine-node:11 AS builder
+WORKDIR /app/server
+COPY package.json ./
+RUN yarn
+COPY . .
+
+FROM mhart/alpine-node
+WORKDIR /app/server
+COPY --from=builder /app/server .
+RUN ls -lah /app/server
+CMD ["node", "/app/server/dist"]
