@@ -1,41 +1,52 @@
-## [70 days left](https://yourcountdown.to/main-en-lair-pa-1554481335) !!!!!!!!!!
+# Compte-rendu DevOps
 
-## Run project
+  
 
-### Start App, DB & Adminer
+Groupe : Anthony LESAGE, Maël MAYON, Guillaume PHAM NGOC, Robin REGIS
 
-`docker-compose up`
+  
+  
 
-See credentials in docker-compose.yml
+Pour le projet Devops nous avons décidé de mettre en place ces outils sur la base existante de notre Projet Annuel.
 
-Access GraphQL Playground here : http://localhost:4000/graphql
+  
 
-Access React app here : http://localhost:3000/
+Notre Projet Annuel consiste en une application séparée en 2 parties principales, la partie web pour le front et la partie serveur pour le back. Le front-end étant du React associé à ApolloClient, et le back-end, basé sur Express et associé à du GraphQL et ApolloServer. Le tout est versionné sur Gitlab.
 
-### .env
+  
 
-Copy both `web/.env.dist` and `server/.env.dist` to `web/.env` and `server/.env`
+De ce fait nous nous sommes naturellement dirigé vers Gitlab CI pour automatiser les tests et le déploiement.
 
-Setup a Stripe account and get your Stripe publishable key and secret key in your .env files
+  
 
-Create a Stripe plan on Stripe website : Billing > Products (example: create a "Dreamteam Solo" product, with a plan called "Standard")  
-Insert the Plan id (something like `plan_AFCHJhjjgvhcf`) in your `server/.env`
+Le code source de notre projet utilise TypeScript, notre étape de build est donc indispensable afin de faire la compilation vers du Javascript natif.  
+  
 
-### Basic commands
+Le projet est dockerisé pour notre développement local, et nous souhaitions faire tourner l’application en production également grâce à Docker.
 
-`yarn gen:types` : update GraphQL schemas if you added a new query / mutation in your React components
+  
 
-`yarn trans:update` : update the JSON files in web/src/translations/locales after you add a new `<FormattedMessage />` tag (see **How to manage texts and translations**) in your React components
+Notre process de mise en production se déroule en 4 étapes :
 
-### How to manage texts and translations
+-   push
+    
+-   Build (Pour compiler le code TypeScript en Javascript et build les images Docker de Web et Server)
+    
+-   Test (Test pour la partie web avec Jest)
+    
+-   Deploy (Pull des dernières images docker et run des containers sur le serveur)
+    
 
-Where you want to insert text, place a `<FormattedMessage />` tag (from react-intl package) with an **id** and **defaultMessage**
+  
 
-Then run `yarn trans:update` to update the JSON translation files
+Pour se faire nous avons créé des Dockerfile pour chaque environnement dans le dossier Web et Server, respectivement Dockerfile (local), Dockerfile.staging (preprod), Dockerfike.prod (production).
 
-### How to send an email
+  
 
-Create in `services/mail.ts` a new function that you export where you need it (most probably in resolver).
+Nous avons défini 3 étapes dans la pipeline grâce au gitlab-ci.yml : Buil, Test et Deploy.
 
-Since we are using [email-template](https://github.com/niftylettuce/email-templates) you need to create a template for your mail in `pug` into the folder emails.
-`template` option match the name of the folder.
+La première va build les images Docker de Web et de Server à partir des Dockerfile.staging puis la push sur le registry Gitlab.
+
+La seconde va lancer les tests sur la partie front.
+
+La dernière va se connecter en SSH à notre serveur de staging basé sur Digital Ocean, stopper les containers Docker en cours, pull les dernières versions des images Docker pour Web et Server et enfin relancer les containers.
