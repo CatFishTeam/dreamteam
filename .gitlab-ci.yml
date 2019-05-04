@@ -1,0 +1,80 @@
+image: docker:stable
+
+stages:
+    #    - build
+    - deploy
+
+variables:
+    SERVER_HOST: 188.166.94.194
+    SERVER_USER: root
+
+services:
+    - docker:dind
+
+#build_staging:
+#    only:
+#        - feature/single-project
+#    stage: build
+#    before_script:
+#        - apk update && apk add openssh
+#        - eval $(ssh-agent -s)
+#        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+#        - mkdir -p ~/.ssh
+#        - chmod 700 ~/.ssh
+#        - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
+#        - chmod 644 ~/.ssh/known_hosts
+#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/.env ./server
+#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/ormconfig.js ./server
+#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/web/.env ./web
+#        - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+#    script:
+#        - docker build -f ./db/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/db .
+#        - docker push registry.gitlab.com/guillaumepn/dreamteam/db:latest
+#        - docker build -f ./server/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/server .
+#        - docker push registry.gitlab.com/guillaumepn/dreamteam/server:latest
+#        - docker build -f ./web/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/web .
+#        - docker push registry.gitlab.com/guillaumepn/dreamteam/web:latest
+
+deploy_staging:
+    only:
+        - feature/single-project
+    stage: deploy
+    environment:
+        name: development
+    before_script:
+        - apk update && apk add openssh
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+    script:
+        # Run postgres
+        - ssh $SERVER_USER@$SERVER_HOST "
+          docker stop db || true &&
+          docker rm db || true &&
+          docker rmi -f registry.gitlab.com/guillaumepn/dreamteam/db || true &&
+          docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY &&
+          docker run --network=dreamteam_net --volume=data_db:/var/lib/postgresql/data --name=db --restart=on-failure:10 -d -p 5432:5432 -e 'POSTGRES_USER=$ORM_USER' -e 'POSTGRES_PASSWORD=$ORM_PASSWORD' -e 'POSTGRES_DB=$ORM_DB' registry.gitlab.com/guillaumepn/dreamteam/db:latest
+          "
+        # Run adminer
+        - ssh $SERVER_USER@$SERVER_HOST "
+          docker stop adminer || true &&
+          docker rm adminer || true &&
+          docker run --network=dreamteam_net --name=adminer --restart=on-failure:10 -d -p 8080:8080 -e 'ADMINER_PLUGINS=tables-filter tinymce' -e 'ADMINER_DESIGN=pepa-linha' adminer
+          "
+        # Run server
+        - ssh $SERVER_USER@$SERVER_HOST "
+          docker stop server || true &&
+          docker rm server || true &&
+          docker rmi -f registry.gitlab.com/guillaumepn/dreamteam/server || true &&
+          docker run --network=dreamteam_net --name=server --restart=on-failure:10 -p -d 4000:4000 registry.gitlab.com/guillaumepn/dreamteam/server:latest
+          "
+        # Run web
+        - ssh $SERVER_USER@$SERVER_HOST "
+          docker stop web || true &&
+          docker rm web || true &&
+          docker rmi -f registry.gitlab.com/guillaumepn/dreamteam/web || true &&
+          docker run --network=dreamteam_net --name=web --restart=on-failure:10 -p -d 8000:80 registry.gitlab.com/guillaumepn/dreamteam/web:latest
+          "
