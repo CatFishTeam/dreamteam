@@ -1,11 +1,13 @@
 FROM mhart/alpine-node:11 AS builder
 WORKDIR /app/web
-COPY package.json .
-RUN yarn --production
-COPY . .
+COPY web/package.json .
+RUN yarn install --pure-lockfile --production
+COPY web .
 
-FROM mhart/alpine-node
+FROM mhart/alpine-node:11
 RUN yarn global add serve
 WORKDIR /app/web
-COPY --from=builder /app/web/build .
-CMD ["serve", "-p", "80", "-s", "."]
+COPY --from=builder /app/web .
+EXPOSE 3000
+RUN yarn build
+CMD ["serve", "-p", "80", "-s", "./build"]
