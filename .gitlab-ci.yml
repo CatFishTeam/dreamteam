@@ -1,7 +1,7 @@
 image: docker:stable
 
 stages:
-    #    - build
+    - build
     - deploy
 
 variables:
@@ -11,33 +11,33 @@ variables:
 services:
     - docker:dind
 
-#build_staging:
-#    only:
-#        - feature/single-project
-#    stage: build
-#    before_script:
-#        - apk update && apk add openssh
-#        - eval $(ssh-agent -s)
-#        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-#        - mkdir -p ~/.ssh
-#        - chmod 700 ~/.ssh
-#        - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
-#        - chmod 644 ~/.ssh/known_hosts
-#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/.env ./server
-#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/ormconfig.js ./server
-#        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/web/.env ./web
-#        - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
-#    script:
-#        - docker build -f ./db/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/db .
-#        - docker push registry.gitlab.com/guillaumepn/dreamteam/db:latest
-#        - docker build -f ./server/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/server .
-#        - docker push registry.gitlab.com/guillaumepn/dreamteam/server:latest
-#        - docker build -f ./web/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/web .
-#        - docker push registry.gitlab.com/guillaumepn/dreamteam/web:latest
+build_staging:
+    only:
+        - staging
+    stage: build
+    before_script:
+        - apk update && apk add openssh
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - ssh-keyscan $SERVER_HOST >> ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/.env ./server
+        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/server/ormconfig.js ./server
+        - scp $SERVER_USER@$SERVER_HOST:/var/www/dreamteam/web/.env ./web
+        - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    script:
+        - docker build -f ./db/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/db .
+        - docker push registry.gitlab.com/guillaumepn/dreamteam/db:latest
+        - docker build -f ./server/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/server .
+        - docker push registry.gitlab.com/guillaumepn/dreamteam/server:latest
+        - docker build -f ./web/Dockerfile.staging -t registry.gitlab.com/guillaumepn/dreamteam/web .
+        - docker push registry.gitlab.com/guillaumepn/dreamteam/web:latest
 
 deploy_staging:
     only:
-        - feature/single-project
+        - staging
     stage: deploy
     environment:
         name: development
