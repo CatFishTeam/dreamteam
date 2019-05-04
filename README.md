@@ -2,7 +2,9 @@
 
   
 
-Groupe : Anthony LESAGE, Maël MAYON, Guillaume PHAM NGOC, Robin REGIS
+<b>Groupe : Anthony LESAGE, Maël MAYON, Guillaume PHAM NGOC, Robin REGIS  
+Classe : 5 IW1</b>
+
 
   
   
